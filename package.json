@@ -1,0 +1,19 @@
+{
+  "name": "pixel-battle",
+  "version": "1.0.0",
+  "description": "Локальный пиксель-арт баттл 500x500 с авторизацией и live-обновлениями (в духе wplace)",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "express-session": "^1.18.1",
+    "ws": "^8.17.1"
+  }
+}
