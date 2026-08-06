@@ -57,6 +57,10 @@
   const zoomFitBtn = document.getElementById('zoom-fit');
   const downloadBtn = document.getElementById('download-btn');
 
+  const modeToggleBtn = document.getElementById('mode-toggle-btn');
+  const modeToggleIcon = document.getElementById('mode-toggle-icon');
+  const modeToggleText = document.getElementById('mode-toggle-text');
+
   const paletteEl = document.getElementById('palette');
   const currentColorEl = document.getElementById('current-color');
   const cooldownRing = document.getElementById('cooldown-ring');
@@ -79,6 +83,12 @@
   let cooldownTimer = null;
   let selectedColorIndex = 1;
   let ws = null;
+
+  // Режим взаимодействия с холстом на тач-устройствах и мышью:
+  // 'view' — только просмотр/пан/зум, тап ничего не красит (по умолчанию,
+  //          чтобы случайный свайп по экрану телефона не ставил пиксель);
+  // 'draw' — тап красит пиксель под пальцем/курсором.
+  let interactionMode = 'view';
 
   let scale = 1;
   let originX = 0;
@@ -138,6 +148,26 @@
     authScreen.classList.add('hidden');
     appScreen.classList.remove('hidden');
   }
+
+  // ---------- Режим рисования / наблюдателя ----------
+  function setMode(mode) {
+    interactionMode = mode;
+    canvasWrap.classList.toggle('draw-mode', mode === 'draw');
+    modeToggleBtn.classList.toggle('active', mode === 'draw');
+    if (mode === 'draw') {
+      modeToggleIcon.textContent = '👁';
+      modeToggleText.textContent = 'Наблюдатель';
+      modeToggleBtn.title = 'Вернуться в режим наблюдателя';
+    } else {
+      modeToggleIcon.textContent = '✏️';
+      modeToggleText.textContent = 'Рисовать';
+      modeToggleBtn.title = 'Включить режим рисования';
+    }
+  }
+
+  modeToggleBtn.addEventListener('click', () => {
+    setMode(interactionMode === 'draw' ? 'view' : 'draw');
+  });
 
   tabLogin.addEventListener('click', () => {
     tabLogin.classList.add('active');
@@ -341,6 +371,7 @@
     userPill.classList.toggle('unlimited', currentUser.noCooldown);
     showAppScreen();
 
+    setMode('view');
     buildPalette();
     resizeCanvasElement();
     fitView();
@@ -461,7 +492,6 @@
 
     tick();
     cooldownTimer = setInterval(tick, 250);
-    if (!silent && remainingMs > 0) showToast('Пиксель поставлен. Кулдаун 1 минута.');
   }
 
   function isReadyToPaint() {
@@ -551,7 +581,7 @@
 
   // Серая подсветка пикселя под курсором — чтобы не промахиваться.
   function drawHoverHighlight() {
-    if (!hoverPixel || dragging) return;
+    if (!hoverPixel || dragging || interactionMode !== 'draw') return;
     const sx = originX + hoverPixel.x * scale;
     const sy = originY + hoverPixel.y * scale;
 
@@ -620,7 +650,11 @@
     dragging = false;
     canvasWrap.classList.remove('dragging');
     if (!dragMoved) {
-      handlePixelClick(e.clientX, e.clientY);
+      if (interactionMode === 'draw') {
+        handlePixelClick(e.clientX, e.clientY);
+      } else {
+        showViewModeHint();
+      }
     }
     updateHoverFromClient(e.clientX, e.clientY);
     scheduleDraw();
@@ -734,7 +768,11 @@
         pinchActive = false;
       } else if (dragging && !dragMoved) {
         const ct = e.changedTouches[0];
-        handlePixelClick(ct.clientX, ct.clientY);
+        if (interactionMode === 'draw') {
+          handlePixelClick(ct.clientX, ct.clientY);
+        } else {
+          showViewModeHint();
+        }
       }
       dragging = false;
     } else if (e.touches.length === 1) {
@@ -755,6 +793,10 @@
     hoverPixel = null;
     scheduleDraw();
   }, { passive: false });
+
+  function showViewModeHint() {
+    showToast('Включите режим «Рисовать» внизу экрана, чтобы поставить пиксель');
+  }
 
   // ---------- Размещение пикселя ----------
   async function handlePixelClick(clientX, clientY) {

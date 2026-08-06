@@ -126,6 +126,63 @@ input:focus-visible {
   color: var(--text);
 }
 
+/* ---------- Баннер телеграм-канала (экран входа) ---------- */
+
+.tg-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.05s;
+}
+
+.tg-banner:hover {
+  border-color: #2ea6e0;
+}
+
+.tg-banner:active {
+  transform: scale(0.99);
+}
+
+.tg-banner-icon {
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.tg-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tg-banner-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2ea6e0;
+}
+
+.tg-banner-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tg-banner-arrow {
+  flex: 0 0 auto;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -291,6 +348,14 @@ input:focus-visible {
   cursor: grabbing;
 }
 
+.canvas-wrap.draw-mode {
+  cursor: crosshair;
+}
+
+.canvas-wrap.draw-mode.dragging {
+  cursor: grabbing;
+}
+
 #view-canvas {
   position: absolute;
   top: 0;
@@ -330,6 +395,41 @@ input:focus-visible {
   border-top: 1px solid var(--border);
   padding-top: 4px;
   color: var(--accent);
+}
+
+.mode-toggle-btn {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  z-index: 5;
+}
+
+.mode-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
+.mode-toggle-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06140d;
+}
+
+.mode-toggle-icon {
+  font-size: 15px;
+  line-height: 1;
 }
 
 .toast {
@@ -465,6 +565,8 @@ input:focus-visible {
 
   .side-controls { right: 10px; bottom: 10px; }
   .side-controls button { width: 40px; height: 40px; font-size: 17px; }
+
+  .mode-toggle-btn { bottom: 10px; padding: 9px 16px; font-size: 12px; }
 
   .palette-bar { padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px)); }
   .palette-row { gap: 10px; }
