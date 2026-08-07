@@ -621,8 +621,16 @@
   // ---------- Взаимодействие мышью: пан / зум / клик ----------
   canvasWrap.addEventListener('contextmenu', (e) => e.preventDefault());
 
+  // Клики по управляющим кнопкам (зум, режим и т.д.) не должны запускать
+  // пан/тап по холсту — иначе всплытие события до canvasWrap приводит к
+  // случайной попытке поставить пиксель или показу подсказки.
+  function isControlTarget(e) {
+    return !!(e.target && e.target.closest && e.target.closest('button'));
+  }
+
   canvasWrap.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
+    if (isControlTarget(e)) return;
     dragging = true;
     dragMoved = false;
     dragStart = { x: e.clientX, y: e.clientY };
@@ -712,6 +720,7 @@
   }
 
   canvasWrap.addEventListener('touchstart', (e) => {
+    if (isControlTarget(e)) return;
     e.preventDefault();
     hoverPixel = null;
 
@@ -734,6 +743,7 @@
   }, { passive: false });
 
   canvasWrap.addEventListener('touchmove', (e) => {
+    if (isControlTarget(e)) return;
     e.preventDefault();
 
     if (e.touches.length >= 2) {
@@ -761,6 +771,7 @@
   }, { passive: false });
 
   canvasWrap.addEventListener('touchend', (e) => {
+    if (isControlTarget(e)) return;
     e.preventDefault();
 
     if (e.touches.length === 0) {
